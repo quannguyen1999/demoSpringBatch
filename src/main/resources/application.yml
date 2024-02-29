@@ -1,0 +1,24 @@
+spring:
+  jpa:
+    show-sql: true
+  batch:
+    jdbc:
+      initialize-schema: always
+  datasource:
+    hikari:
+      connectionTimeout: 20000
+      maximum-pool-size: 5
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=db_batch
+    jdbc-url: jdbc:postgresql://localhost:5432/postgres?currentSchema=db_batch
+    username: postgres
+    password: postgres
+  logging:
+    level:
+      org.springframework.batch.item.database.JdbcPagingItemReader: DEBUG
+
+#logging:
+#  level:
+#    org:
+#      springframework:
+#        security: TRACE
+#    feign: DEBUG
