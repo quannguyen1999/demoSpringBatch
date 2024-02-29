@@ -20,6 +20,9 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.*;
 import org.springframework.batch.item.database.support.MySqlPagingQueryProvider;
 import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.FlatFileItemWriter;
+import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
+import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -27,6 +30,7 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -86,24 +90,45 @@ public class BatchConfiguration {
 //        };
 //    }
 
+//    @Bean
+//    public ItemWriter<Order> writerExcel() {
+//        return items -> {
+//            try (Workbook workbook = new XSSFWorkbook()) {
+//                Sheet sheet = workbook.createSheet("Orders");
+//                int rowNum = 0;
+//                for (Order order : items) {
+//                    Row row = sheet.createRow(rowNum++);
+//                    row.createCell(0).setCellValue(order.getId().toString());
+//                    row.createCell(1).setCellValue(order.getName());
+//                }
+//                try (FileOutputStream fileOut = new FileOutputStream("C:\\output.xlsx")) {
+//                    workbook.write(fileOut);
+//                    System.out.println("Excel file has been created successfully!");
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            } catch (IOException e) {
+//                throw new RuntimeException("Error writing to Excel file", e);
+//            }
+//        };
+//    }
+
     @Bean
-    public ItemWriter<Order> writerExcel() {
-        return items -> {
-            try (Workbook workbook = new XSSFWorkbook()) {
-                Sheet sheet = workbook.createSheet("Orders");
-                int rowNum = 0;
-                for (Order order : items) {
-                    Row row = sheet.createRow(rowNum++);
-                    row.createCell(0).setCellValue(order.getId().toString());
-                    row.createCell(1).setCellValue(order.getName());
-                }
-                try (FileOutputStream fileOut = new FileOutputStream("output.xlsx")) {
-                    workbook.write(fileOut);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException("Error writing to Excel file", e);
-            }
-        };
+    public FlatFileItemWriter<Order> writer(){
+        FlatFileItemWriter<Order> writer =  new FlatFileItemWriter<>();
+        writer.setResource(new FileSystemResource("C://data.csv"));
+        DelimitedLineAggregator<Order> aggregator = new DelimitedLineAggregator<>();
+        writer.setLineAggregator(getDelimitedLineAggregator());
+        return writer;
+    }
+
+    private DelimitedLineAggregator<Order> getDelimitedLineAggregator() {
+        BeanWrapperFieldExtractor<Order> beanWrapperFieldExtractor = new BeanWrapperFieldExtractor<Order>();
+        beanWrapperFieldExtractor.setNames(new String[] {"id", "name"});
+        DelimitedLineAggregator<Order > aggregator = new DelimitedLineAggregator<Order>();
+        aggregator.setDelimiter(",");
+        aggregator.setFieldExtractor(beanWrapperFieldExtractor);
+        return aggregator;
     }
 
     @Bean
@@ -117,7 +142,7 @@ public class BatchConfiguration {
         return new StepBuilder("step1", jobRepository)
                 .<Order, Order>chunk(5 , transactionManager)
                 .reader(pagingItemReader())
-                .writer(writerExcel())
+                .writer(writer())
                 .build();
     }
 

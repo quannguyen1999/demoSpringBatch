@@ -35,18 +35,20 @@ public class BatchController {
                 .addString("timestamp", String.valueOf(System.currentTimeMillis()))
                 .toJobParameters();
         JobExecution jobExecution = jobLauncher.run(job, jobParameters);
-        if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
-            ExecutionContext jobExecutionContext = jobExecution.getExecutionContext();
-            byte[] excelBytes = (byte[]) jobExecutionContext.get("excelFile");
-            ByteArrayResource resource = new ByteArrayResource(excelBytes);
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"output.xlsx\"")
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .body(resource);
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//        if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
+//            ExecutionContext jobExecutionContext = jobExecution.getExecutionContext();
+//            byte[] excelBytes = (byte[]) jobExecutionContext.get("excelFile");
+//            ByteArrayResource resource = new ByteArrayResource(excelBytes);
+//            return ResponseEntity.ok()
+//                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"output.xlsx\"")
+//                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+//                    .body(resource);
+//        } else {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(null);
+//        }
+        return ResponseEntity.status(HttpStatus.OK)
                     .body(null);
-        }
     }
 
     private byte[] getExcelBytes() throws IOException {
