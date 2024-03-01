@@ -1,11 +1,11 @@
-package com.example.demoSpringBatch.repository;
-
-import com.example.demoSpringBatch.models.Order;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-import java.util.UUID;
-
-@Repository
-public interface OrderRepository extends JpaRepository<Order, UUID> {
-}
+//package com.example.demoSpringBatch.repository;
+//
+//import com.example.demoSpringBatch.models.Order;
+//import org.springframework.data.jpa.repository.JpaRepository;
+//import org.springframework.stereotype.Repository;
+//
+//import java.util.UUID;
+//
+//@Repository
+//public interface OrderRepository extends JpaRepository<Order, UUID> {
+//}

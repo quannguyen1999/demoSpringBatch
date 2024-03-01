@@ -2,8 +2,11 @@ spring:
   jpa:
     show-sql: true
   batch:
+    allow-start-if-complete: false
     jdbc:
       initialize-schema: always
+      allow-start-if-complete: false
+
   datasource:
     hikari:
       connectionTimeout: 20000
