@@ -10,6 +10,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
@@ -25,6 +26,7 @@ import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -57,8 +59,12 @@ public class BatchConfiguration {
         return reader;
     }
 
+
+    @StepScope
     @Bean
-    public JdbcPagingItemReader<Order> pagingItemReader(){
+    public JdbcPagingItemReader<Order> pagingItemReader(@Value("#{jobParameters['valueTest']}") String contributionCardCsvFileName){
+        System.out.println("Start testing");
+        System.out.println(contributionCardCsvFileName);
         JdbcPagingItemReader<Order> reader = new JdbcPagingItemReader<>();
         reader.setDataSource(dataSource);
         reader.setFetchSize(10);
@@ -141,7 +147,7 @@ public class BatchConfiguration {
     public Step step1(JobRepository jobRepository, DataSourceTransactionManager transactionManager) {
         return new StepBuilder("step1", jobRepository)
                 .<Order, Order>chunk(5 , transactionManager)
-                .reader(pagingItemReader())
+                .reader(pagingItemReader(null))
                 .writer(writer())
                 .build();
     }

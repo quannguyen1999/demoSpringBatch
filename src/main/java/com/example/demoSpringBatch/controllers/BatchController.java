@@ -33,6 +33,7 @@ public class BatchController {
     public ResponseEntity<Resource> exportExcel() throws Exception {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addString("timestamp", String.valueOf(System.currentTimeMillis()))
+                .addString("valueTest","dit con me no work kia moi nguoi")
                 .toJobParameters();
         JobExecution jobExecution = jobLauncher.run(job, jobParameters);
 //        if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
